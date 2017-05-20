@@ -8,6 +8,7 @@ var bodyParser = require('body-parser');
 
 var index = require('./routes/index');
 var ads = require('./routes/ads');
+var indexDB = require('./models/index')
 
 var app = express();
 

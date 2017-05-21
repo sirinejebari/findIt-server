@@ -55,5 +55,13 @@ router.delete('/:id', function (req, res, next) {
 
 })
 
+router.post('/search', function (req, res, next) {
+  model.search(type, req.body).then(function (data) {
+    res.json(data.hits.hits)
+  }, function (error) {
+    res.json({error: error.message});
+  })
+})
+
 
 module.exports = router;

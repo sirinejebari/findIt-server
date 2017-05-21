@@ -122,4 +122,43 @@ model.deleteResource = function (type, id) {
   })
 
 }
+
+model.search = function (type, fields) {
+  console.log("*****************************fields", fields)
+
+  return new Promise(function (resolve, reject) {
+    console.log("*****************************data", buildMatchQueryFields(fields))
+
+    ElasticClient.search({
+      index: index,
+      type: type,
+      body: {
+        "query": {
+          "bool": {
+            "should": buildMatchQueryFields(fields)
+          }
+        }
+      }
+    }).then(function (data) {
+
+      if (data) {
+        resolve(data.hits.hits)
+      }
+    }, function (err) {
+      reject(err)
+    })
+  })
+}
+function buildMatchQueryFields(data) {
+  var output= []
+  Object.keys(data).forEach(function(key) {
+    var match = {}
+    match[key.toString()]= data[key]
+    var object = {"match": match}
+    output.push(object)
+
+  });
+  return output
+}
+
 module.exports = model;

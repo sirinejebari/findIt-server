@@ -1,4 +1,6 @@
 var express = require('express');
+var model = require('../models/model.js');
+
 var router = express.Router();
 var type = 'ad'
 var index = 'sirinecorp';
@@ -7,24 +9,16 @@ var ElasticClient = require('../models/elasticClient.js');
 
 
 router.get('/', function (req, res, next) {
-  ElasticClient.search({
-    index: index,
-    type: type,
-    body: {
-      "query": {
-        "match_all": {}
-      }
-    }
-  }).then(function (body) {
-    var hits = body.hits.hits;
-    res.json(hits);
-  }, function (error) {
-    console.trace(error.message);
-  });
+  model.getAllForType(type).then(function (data) {
+    res.json(data.hits.hits)
+  }, function (err) {
+    res.json({error: err.message})
+
+  })
 });
 
 router.get('/:id', function (req, res, next) {
-  getResource(req.params.id).then(function (data) {
+  model.getResource(req.params.id, type).then(function (data) {
     res.json(data)
   }, function (err) {
     res.json({error: err})
@@ -32,49 +26,34 @@ router.get('/:id', function (req, res, next) {
 });
 
 router.post('/', function (req, res, next) {
-  ElasticClient.count({
-    index: index,
-    type: type
-  }).then(function (data) {
-
-    var lastid = data.count + 1
-    ElasticClient.create({
-      index: index,
-      type: type,
-      id: lastid,
-      body: req.body
-    })
-      .then(function (body) {
-        setTimeout(function () {
-          getResource(lastid).then(function (data) {
-            res.json(data._source)
-          }, function (err) {
-            res.json({error: err})
-          })
-        }, function (error) {
-          res.json({error: error.message});
-        });
-      }, 5000);
-
-  })
-});
-
-function getResource(id) {
-  return new Promise(function (resolve, reject) {
-    ElasticClient.get({
-      index: index,
-      type: type,
-      id: id
-    }, function (error, response) {
-      if (error) {
-        reject(error)
-      }
-      if (response) {
-        resolve(response)
-      }
+  model.createResource(type, req.body)
+    .then(function (data) {
+      res.json(data._source)
+    }, function (error) {
+      res.json({error: error.message});
     });
-  })
 
-}
+})
+//TODO doesnt work, to figure out later
+router.put('/:id', function (req, res, next) {
+  model.editResource(type, req.params.id, req.body)
+    .then(function (data) {
+      res.json(data._source)
+    }, function (error) {
+      res.json({error: error.message});
+    });
+
+})
+
+router.delete('/:id', function (req, res, next) {
+  model.deleteResource(type, req.params.id)
+    .then(function (data) {
+      res.json(data._source)
+    }, function (error) {
+      res.json({error: error.message});
+    });
+
+})
+
 
 module.exports = router;

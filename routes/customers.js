@@ -6,7 +6,39 @@ var model = require('../models/model.js');
 
 var router = express.Router();
 var type = 'customer'
-var index = 'sirinecorp';
+var jwt    = require('jsonwebtoken'); // used to create, sign, and verify tokens
+
+router.use(function(req, res, next) {
+
+  // check header or url parameters or post parameters for token
+  var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.headers['Authorization'];
+
+  // decode token
+  if (token) {
+
+    // verifies secret and checks exp
+    jwt.verify(token, req.app.get('superSecret'), function(decoded, err) {
+      if (err) {
+        return res.json({ success: false, message: 'Unauthorized' });
+      } else {
+        // if everything is good, save to request for use in other routes
+        req.decoded = decoded;
+        console.log(req.decoded)
+        next();
+      }
+    });
+
+  } else {
+
+    // if there is no token
+    // return an error
+    return res.status(403).send({
+      success: false,
+      message: 'No token provided.'
+    });
+
+  }
+});
 
 router.get('/', function (req, res, next) {
   model.getAllForType(type).then(function (data) {

@@ -1,8 +1,11 @@
+/**
+ * Created by sirine on 5/21/17.
+ */
 var express = require('express');
 var model = require('../models/model.js');
 
 var router = express.Router();
-var type = 'ad'
+var type = 'customer'
 var index = 'sirinecorp';
 
 router.get('/', function (req, res, next) {

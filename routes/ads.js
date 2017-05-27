@@ -24,6 +24,29 @@ router.get('/:id', function (req, res, next) {
 
 router.post('/', function (req, res, next) {
   model.authorize(req).then(function (data) {
+    if(!req.body.lat || req.body.lat  === ''){
+      return  res.status(400).json({error: "invalid address: lat missing"});
+    }
+    if(!req.body.long || req.body.long  === ''){
+      return  res.status(400).json({error: "invalid address: long missing"});
+    }
+    if(!req.body.address || req.body.address  === ''){
+      return res.status(400).json({error: "missing field : address"});
+    }
+    if( !req.body.title || req.body.title  === ''){
+      return res.status(400).json({error: "missing field : title"});
+    }
+    if(!req.body.price || req.body.price  === ''){
+      return res.status(400).json({error: "missing field : price"});
+    }
+    if(!req.body.description || req.body.description  === ''){
+      return res.status(400).json({error: "missing field : price"});
+    }
+    if(!req.body.expiration_date || req.body.price  === ''){
+      var date = new Date()
+      date.setMonth(date.getMonth() + 1);
+      req.body.expiration_date = date
+    }
 
     model.createResource(type, req.body)
       .then(function (data) {
@@ -32,7 +55,7 @@ router.post('/', function (req, res, next) {
         res.json({error: error.message});
       });
   }).catch(function (err) {
-    res.json({error: err});
+    res.status(err.status).json({error: err});
   });
 
 })
@@ -47,7 +70,7 @@ router.put('/:id', function (req, res, next) {
         res.json({error: error.message});
       });
   }).catch(function (err) {
-    res.json({error: err});
+    res.status(err.status).json({error: err});
   });
 });
 
@@ -61,7 +84,7 @@ router.delete('/:id', function (req, res, next) {
         res.json({error: error.message});
       });
   }).catch(function (err) {
-    res.json({error: err});
+    res.status(err.status).json({error: err});
   });
 })
 

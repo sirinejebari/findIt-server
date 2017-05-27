@@ -7,37 +7,6 @@ var model = require('../models/model.js');
 var router = express.Router();
 var type = 'customer'
 
-/*router.use(function(req, res, next) {
-
- // check header or url parameters or post parameters for token
- var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.headers['Authorization'];
-
- // decode token
- if (token) {
-
- // verifies secret and checks exp
- jwt.verify(token, req.app.get('superSecret'), function(decoded, err) {
- if (err) {
- return res.json({ success: false, message: 'Unauthorized' });
- } else {
- // if everything is good, save to request for use in other routes
- req.decoded = decoded;
- console.log(req.decoded)
- next();
- }
- });
-
- } else {
-
- // if there is no token
- // return an error
- return res.status(403).send({
- success: false,
- message: 'No token provided.'
- });
-
- }
- });*/
 
 router.get('/', function (req, res, next) {
   model.getAllForType(type).then(function (data) {
@@ -56,12 +25,28 @@ router.get('/:id', function (req, res, next) {
       res.json({error: err})
     })
   }).catch(function (err) {
-    res.json({error: err});
+    res.status(err.status).json({error: err});
   })
 
 });
 
 router.post('/', function (req, res, next) {
+  if(!req.body.first_name || req.body.first_name  === ''){
+   return  res.status(400).json({error: "missing field : first_name"});
+  }
+  if(!req.body.last_name || req.body.last_name  === ''){
+    return res.status(400).json({error: "missing field : last_name"});
+  }
+  if(!req.body.email || req.body.email  === ''){
+    return res.status(400).json({error: "missing field : email"});
+  }
+  if( !req.body.password || req.body.password  === ''){
+    return res.status(400).json({error: "missing field : password"});
+  }
+  if(!req.body.phone_number || req.body.phone_number  === ''){
+    return res.status(400).json({error: "missing field : phone_number"});
+  }
+
   model.createResource(type, req.body)
     .then(function (data) {
       res.json(data._source)
@@ -80,7 +65,7 @@ router.put('/:id', function (req, res, next) {
         res.json({error: error.message});
       })
   }).catch(function (err) {
-    res.json({error: err});
+    res.status(err.status).json({error: err});
   });
 
 })
@@ -94,7 +79,7 @@ router.delete('/:id', function (req, res, next) {
         res.json({error: error.message});
       });
   }).catch(function (err) {
-    res.json({error: err});
+    res.status(err.status).json({error: err});
   });
 })
 
@@ -107,7 +92,7 @@ router.post('/search', function (req, res, next) {
       res.json({error: error.message});
     })
   }).catch(function (err) {
-    res.json({error: err});
+    res.status(err.status).json({error: err});
   });
 })
 

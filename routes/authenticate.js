@@ -16,12 +16,12 @@ router.post('/', function(req, res) {
     if (err) throw err;
 
     if (!uniqueUser) {
-      res.json({success: false, message: 'Authentication failed. User not found.'});
+      res.status(404).json({success: false, message: 'Authentication failed. User not found.'});
     } else if (uniqueUser) {
 
       // check if password matches
       if (uniqueUser.password != req.body.password) {
-        res.json({success: false, message: 'Authentication failed. Wrong password.'});
+        res.status(401).json({success: false, message: 'Authentication failed. Wrong password.'});
       } else {
 
         // if user is found and password is right
@@ -33,7 +33,6 @@ router.post('/', function(req, res) {
         // return the information including token as JSON
         res.json({
           success: true,
-          message: 'Enjoy your token!',
           token: token
         });
       }

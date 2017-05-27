@@ -3,6 +3,7 @@
  */
 var index = 'sirinecorp';
 var ElasticClient = require('../models/elasticClient.js');
+var bcrypt = require('bcrypt-nodejs');
 
 var model = {};
 
@@ -45,6 +46,11 @@ model.getResource = function (id, type) {
 }
 
 model.createResource = function (type, body) {
+  if(type == 'customer'){
+    var passwordHash = bcrypt.hashSync("bacon");
+    body.password= passwordHash;
+    console.log(passwordHash)
+  }
   var lastId;
   return new Promise(function (resolve, reject) {
     ElasticClient.count({

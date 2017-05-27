@@ -8,6 +8,7 @@
     "start kibana": " cd /home/sirine/kibana-5.2.2-linux-x86_64/bin && ./kibana "
   },
   "dependencies": {
+    "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.17.2",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.3",

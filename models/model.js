@@ -4,8 +4,30 @@
 var index = 'sirinecorp';
 var ElasticClient = require('../models/elasticClient.js');
 var bcrypt = require('bcrypt-nodejs');
+var jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
 
 var model = {};
+
+model.authorize = function (req, res, next) {
+  return new Promise(function (resolve, reject) {
+    var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.headers['Authorization'];
+
+    if (token) {
+      jwt.verify(token, req.app.get('superSecret'), function (err, decoded) {
+        if (err) reject({success: false, message: 'Unauthorized', error: err});
+
+        else   resolve(decoded);
+      });
+    } else {
+      reject({
+        success: false,
+        message: 'No token provided.',
+        status: 403
+      });
+
+    }
+  })
+};
 
 model.getAllForType = function (type) {
   return new Promise(function (resolve, reject) {
@@ -38,7 +60,7 @@ model.getResource = function (id, type) {
         reject(error)
       }
       if (response) {
-        resolve(response)
+        resolve(response._source)
       }
     });
   })
@@ -46,9 +68,9 @@ model.getResource = function (id, type) {
 }
 
 model.createResource = function (type, body) {
-  if(type == 'customer'){
+  if (type == 'customer') {
     var passwordHash = bcrypt.hashSync("bacon");
-    body.password= passwordHash;
+    body.password = passwordHash;
     console.log(passwordHash)
   }
   var lastId;
@@ -116,7 +138,7 @@ model.deleteResource = function (type, id) {
       index: index,
       type: type,
       id: id
-    }, function ( response,error) {
+    }, function (response, error) {
       if (error) {
         reject(error)
       }
@@ -156,10 +178,10 @@ model.search = function (type, fields) {
   })
 }
 function buildMatchQueryFields(data) {
-  var output= []
-  Object.keys(data).forEach(function(key) {
+  var output = []
+  Object.keys(data).forEach(function (key) {
     var match = {}
-    match[key.toString()]= data[key]
+    match[key.toString()] = data[key]
     var object = {"match": match}
     output.push(object)
 

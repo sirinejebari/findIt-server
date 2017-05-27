@@ -23,33 +23,46 @@ router.get('/:id', function (req, res, next) {
 });
 
 router.post('/', function (req, res, next) {
-  model.createResource(type, req.body)
-    .then(function (data) {
-      res.json(data._source)
-    }, function (error) {
-      res.json({error: error.message});
-    });
+  model.authorize(req).then(function (data) {
+
+    model.createResource(type, req.body)
+      .then(function (data) {
+        res.json(data._source)
+      }, function (error) {
+        res.json({error: error.message});
+      });
+  }).catch(function (err) {
+    res.json({error: err});
+  });
 
 })
 //TODO doesnt work, to figure out later
 router.put('/:id', function (req, res, next) {
-  model.editResource(type, req.params.id, req.body)
-    .then(function (data) {
-      res.json(data._source)
-    }, function (error) {
-      res.json({error: error.message});
-    });
+  model.authorize(req).then(function (data) {
 
-})
+    model.editResource(type, req.params.id, req.body)
+      .then(function (data) {
+        res.json(data._source)
+      }, function (error) {
+        res.json({error: error.message});
+      });
+  }).catch(function (err) {
+    res.json({error: err});
+  });
+});
 
 router.delete('/:id', function (req, res, next) {
-  model.deleteResource(type, req.params.id)
-    .then(function (data) {
-      res.json(data._source)
-    }, function (error) {
-      res.json({error: error.message});
-    });
+  model.authorize(req).then(function (data) {
 
+    model.deleteResource(type, req.params.id)
+      .then(function (data) {
+        res.json(data._source)
+      }, function (error) {
+        res.json({error: error.message});
+      });
+  }).catch(function (err) {
+    res.json({error: err});
+  });
 })
 
 

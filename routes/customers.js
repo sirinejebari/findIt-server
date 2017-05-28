@@ -31,21 +31,41 @@ router.get('/:id', function (req, res, next) {
 });
 
 router.post('/', function (req, res, next) {
-  if(!req.body.first_name || req.body.first_name  === ''){
-   return  res.status(400).json({error: "missing field : first_name"});
+  if (!req.body.first_name || req.body.first_name === '') {
+    return res.status(400).json({error: "missing field : first_name"});
   }
-  if(!req.body.last_name || req.body.last_name  === ''){
+  if (!req.body.last_name || req.body.last_name === '') {
     return res.status(400).json({error: "missing field : last_name"});
   }
-  if(!req.body.email || req.body.email  === ''){
+  if (!req.body.email || req.body.email === '') {
     return res.status(400).json({error: "missing field : email"});
   }
-  if( !req.body.password || req.body.password  === ''){
+  if (!req.body.password || req.body.password === '') {
     return res.status(400).json({error: "missing field : password"});
   }
-  if(!req.body.phone_number || req.body.phone_number  === ''){
+  if (!req.body.phone_number || req.body.phone_number === '') {
     return res.status(400).json({error: "missing field : phone_number"});
   }
+
+  model.search('customer', {email: req.body.email}).then(function (user, err) {
+    if (user !== []) {
+      var uniqueUser = user[0]._source
+      if (err) throw err;
+      if (uniqueUser && user[0]._score >= 1) {
+        return res.status(400).json({error: "email address already used"});
+      }
+    }
+  });
+
+  model.search('customer', {phone_number: req.body.phone_number}).then(function (user, err) {
+    if (user !== []) {
+      var uniqueUser = user[0]._source
+      if (err) throw err;
+      if (uniqueUser && user[0]._score >= 1) {
+        return res.status(400).json({error: "phone_number already used"});
+      }
+    }
+  })
 
   model.createResource(type, req.body)
     .then(function (data) {
@@ -53,6 +73,7 @@ router.post('/', function (req, res, next) {
     }, function (error) {
       res.json({error: error.message});
     });
+
 
 })
 //TODO doesnt work, to figure out later

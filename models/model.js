@@ -71,7 +71,6 @@ model.createResource = function (type, body) {
   if (type == 'customer') {
     var passwordHash = bcrypt.hashSync("bacon");
     body.password = passwordHash;
-    console.log(passwordHash)
   }
   var lastId;
   return new Promise(function (resolve, reject) {
@@ -152,10 +151,8 @@ model.deleteResource = function (type, id) {
 }
 
 model.search = function (type, fields) {
-  console.log("*****************************fields", fields)
 
   return new Promise(function (resolve, reject) {
-    console.log("*****************************data", buildMatchQueryFields(fields))
 
     ElasticClient.search({
       index: index,
@@ -168,6 +165,34 @@ model.search = function (type, fields) {
         }
       }
     }).then(function (data) {
+
+      if (data) {
+        resolve(data.hits.hits)
+      }
+    }, function (err) {
+      reject(err)
+    })
+  })
+}
+model.searchExactly = function (type, fields) {
+  return new Promise(function (resolve, reject) {
+
+    ElasticClient.search({
+      index: index,
+      type: type,
+      body: {
+        "query": {
+          "constant_score" : {
+            "filter" : {
+              "term" : {
+                "phone_number" : "+21626596487"
+              }
+            }
+          }
+        }
+      }
+    }).then(function (data) {
+      console.log("***********************", data)
 
       if (data) {
         resolve(data.hits.hits)

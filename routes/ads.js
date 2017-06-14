@@ -88,5 +88,19 @@ router.delete('/:id', function (req, res, next) {
   });
 })
 
+router.post('/search', function (req, res, next) {
+  model.authorize(req).then(function (data) {
+    model.search(type, req.body)
+      .then(function (data) {
+        res.json(data)
+      }, function (error) {
+        res.json({error: error.message});
+      });
+  }).catch(function (err) {
+    res.status(err.status).json({error: err});
+  });
+
+})
+
 
 module.exports = router;

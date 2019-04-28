@@ -7,6 +7,8 @@ var router = express.Router();
 var model = require('../models/model.js');
 var jwt    = require('jsonwebtoken'); // used to create, sign, and verify tokens
 var app = require('../app');
+var bcrypt = require('bcrypt-nodejs');
+
 router.post('/', function(req, res) {
 
   // find the user
@@ -18,9 +20,9 @@ router.post('/', function(req, res) {
     if (!uniqueUser) {
       res.status(404).json({success: false, message: 'Authentication failed. User not found.'});
     } else if (uniqueUser) {
-
+console.log(uniqueUser)
       // check if password matches
-      if (uniqueUser.password != req.body.password) {
+      if (!bcrypt.compareSync(req.body.password, uniqueUser.password)) {
         res.status(401).json({success: false, message: 'Authentication failed. Wrong password.'});
       } else {
 

@@ -41,6 +41,8 @@ model.getAllForType = function (type) {
       }
     }).then(function (response) {
       if (response) {
+        console.log("type of response", typeof response)
+        console.log("response is", response)
         resolve(response)
       }
     }, function (error) {
@@ -69,7 +71,7 @@ model.getResource = function (id, type) {
 
 model.createResource = function (type, body) {
   if (type == 'customer') {
-    var passwordHash = bcrypt.hashSync("bacon");
+    var passwordHash = bcrypt.hashSync(body.password);
     body.password = passwordHash;
   }
   var lastId;
@@ -151,7 +153,8 @@ model.deleteResource = function (type, id) {
 }
 
 model.search = function (type, fields) {
-  fields.state = 'valid'
+  fields.state = 'valid';
+  console.log(fields, type)
   //TODO handle expiry_date
   //TODO within x km from lat long
   return new Promise(function (resolve, reject) {

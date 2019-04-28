@@ -10,7 +10,12 @@ var type = 'customer'
 
 router.get('/', function (req, res, next) {
   model.getAllForType(type).then(function (data) {
-    res.json(data.hits.hits)
+    res.json({
+      total: data.hits.total.value,
+      results: data.hits.hits.map(hit => {
+        return hit//["_source"]
+      })
+    })
   }, function (err) {
     res.json({error: err.message})
 
@@ -43,7 +48,7 @@ router.post('/', function (req, res, next) {
   if (!req.body.password || req.body.password === '') {
     return res.status(400).json({error: "missing field : password"});
   }
-  if (!req.body.password.length < 6) {
+  if (req.body.password.length < 6) {
     return res.status(400).json({error: "password too short"});
   }
   if (!req.body.phone_number || req.body.phone_number === '') {

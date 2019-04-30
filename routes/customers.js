@@ -10,7 +10,6 @@ var type = 'customers'
 
 router.get('/', function (req, res, next) {
   model.getAllForType(type).then(function (data) {
-    //res.json(data)
     res.json({
       total: data.hits.total.value,
       results: data.hits.hits.map(hit => {

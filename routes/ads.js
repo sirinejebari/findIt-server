@@ -51,7 +51,6 @@ router.post('/', function (req, res, next) {
       date.setMonth(date.getMonth() + 1);
       req.body.expiration_date = date
     }
-console.log("here, all set")
     model.createResource(type, req.body)
       .then(function (data) {
         res.json(data._source)

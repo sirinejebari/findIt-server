@@ -12,7 +12,7 @@ var bcrypt = require('bcrypt-nodejs');
 router.post('/', function(req, res) {
 
   // find the user
-  model.search('customer', req.body).then(function (user, err) {
+  model.search('customers', req.body).then(function (user, err) {
     var uniqueUser = user[0]._source
 
     if (err) throw err;

@@ -56,7 +56,7 @@ router.post('/', function (req, res, next) {
     return res.status(400).json({error: "missing field : phone_number"});
   }
 
-  model.search('customer', {email: req.body.email}).then(function (user, err) {
+  model.search('customers', {email: req.body.email}).then(function (user, err) {
     if (user.length) {
       var uniqueUser = user[0]._source
       if (err) throw err;
@@ -66,7 +66,7 @@ router.post('/', function (req, res, next) {
     }
   });
 
-  model.search('customer', {phone_number: req.body.phone_number}).then(function (user, err) {
+  model.search('customers', {phone_number: req.body.phone_number}).then(function (user, err) {
     if (user.length) {
       var uniqueUser = user[0]._source
       if (err) throw err;

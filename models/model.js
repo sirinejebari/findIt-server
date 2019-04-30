@@ -64,7 +64,7 @@ model.getResource = function (id, index) {
 }
 
 model.createResource = function (index, body) {
-  if (index == 'customer') {
+  if (index == 'customers') {
     var passwordHash = bcrypt.hashSync(body.password);
     body.password = passwordHash;
   }

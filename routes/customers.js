@@ -18,6 +18,7 @@ router.get('/', function (req, res, next) {
       })
     })
   }, function (err) {
+    console.log(err);
     res.json({error: err.message})
 
   })
@@ -58,7 +59,6 @@ router.post('/', function (req, res, next) {
 
   model.search('customer', {email: req.body.email}).then(function (user, err) {
     if (user.length) {
-      console.log("************user********", user)
       var uniqueUser = user[0]._source
       if (err) throw err;
       if (uniqueUser && user[0]._score >= 1) {

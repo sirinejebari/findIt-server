@@ -163,7 +163,7 @@ model.search = function (index, fields) {
     }).then(function (data) {
 
       if (data) {
-        resolve(data.hits.hits)
+        resolve(data.body)
       }
     }, function (err) {
       reject(err)
@@ -189,7 +189,7 @@ model.searchExactly = function (index, fields) {
     }).then(function (data) {
 
       if (data) {
-        resolve(data.hits.hits)
+        resolve(data.body)
       }
     }, function (err) {
       reject(err)

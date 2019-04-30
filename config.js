@@ -3,7 +3,6 @@
  */
 module.exports = {
 
-  'secret': 'iamcreatinganawesomewebapp',
-  'database': 'sirinecorp'
+  'secret': 'iamcreatinganawesomewebapp'
 
 };

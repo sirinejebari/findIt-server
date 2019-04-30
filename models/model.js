@@ -1,11 +1,9 @@
 /**
  * Created by sirine on 5/21/17.
  */
-var index = 'sirinecorp';
 var ElasticClient = require('../models/elasticClient.js');
 var bcrypt = require('bcrypt-nodejs');
 var jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
-
 var model = {};
 
 model.authorize = function (req, res, next) {
@@ -29,11 +27,10 @@ model.authorize = function (req, res, next) {
   })
 };
 
-model.getAllForType = function (type) {
+model.getAllForType = function (index) {
   return new Promise(function (resolve, reject) {
     ElasticClient.search({
       index: index,
-      type: type,
       body: {
         "query": {
           "match_all": {}
@@ -41,9 +38,7 @@ model.getAllForType = function (type) {
       }
     }).then(function (response) {
       if (response) {
-        console.log("type of response", typeof response)
-        console.log("response is", response)
-        resolve(response)
+        resolve(response.body)
       }
     }, function (error) {
       reject(error)
@@ -51,11 +46,10 @@ model.getAllForType = function (type) {
   })
 }
 
-model.getResource = function (id, type) {
+model.getResource = function (id, index) {
   return new Promise(function (resolve, reject) {
     ElasticClient.get({
       index: index,
-      type: type,
       id: id
     }, function (error, response) {
       if (error) {
@@ -69,29 +63,29 @@ model.getResource = function (id, type) {
 
 }
 
-model.createResource = function (type, body) {
-  if (type == 'customer') {
+model.createResource = function (index, body) {
+  if (index == 'customer') {
     var passwordHash = bcrypt.hashSync(body.password);
     body.password = passwordHash;
   }
   var lastId;
   return new Promise(function (resolve, reject) {
     ElasticClient.count({
-      index: index,
-      type: type
+      index: index
     }).then(function (data) {
+      console.log("count: *************************",data)
       lastId = data.count + 1
       ElasticClient.create({
         index: index,
-        type: type,
         id: lastId,
+        type: index,
         body: body
       }, function (error, response) {
         if (error) {
           reject(error)
         }
         if (response) {
-          model.getResource(lastId, type).then(function (data) {
+          model.getResource(lastId, index).then(function (data) {
             resolve(data)
           }).catch(function (err) {
             reject(error)
@@ -103,12 +97,11 @@ model.createResource = function (type, body) {
 
 }
 
-model.editResource = function (type, id, data) {
+model.editResource = function (index, id, data) {
   return new Promise(function (resolve, reject) {
 
     ElasticClient.update({
       index: index,
-      type: type,
       id: id,
       body: {
         script: {
@@ -132,12 +125,11 @@ model.editResource = function (type, id, data) {
   })
 
 }
-model.deleteResource = function (type, id) {
+model.deleteResource = function (index, id) {
   return new Promise(function (resolve, reject) {
 
     ElasticClient.delete({
       index: index,
-      type: type,
       id: id
     }, function (response, error) {
       if (error) {
@@ -152,16 +144,15 @@ model.deleteResource = function (type, id) {
 
 }
 
-model.search = function (type, fields) {
+model.search = function (index, fields) {
   fields.state = 'valid';
-  console.log(fields, type)
+  console.log(fields)
   //TODO handle expiry_date
   //TODO within x km from lat long
   return new Promise(function (resolve, reject) {
 
     ElasticClient.search({
       index: index,
-      type: type,
       body: {
         "query": {
           "bool": {
@@ -179,12 +170,11 @@ model.search = function (type, fields) {
     })
   })
 }
-model.searchExactly = function (type, fields) {
+model.searchExactly = function (index, fields) {
   return new Promise(function (resolve, reject) {
 
     ElasticClient.search({
       index: index,
-      type: type,
       body: {
         "query": {
           "constant_score" : {
@@ -197,7 +187,6 @@ model.searchExactly = function (type, fields) {
         }
       }
     }).then(function (data) {
-      console.log("***********************", data)
 
       if (data) {
         resolve(data.hits.hits)

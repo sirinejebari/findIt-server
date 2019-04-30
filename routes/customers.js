@@ -10,10 +10,11 @@ var type = 'customer'
 
 router.get('/', function (req, res, next) {
   model.getAllForType(type).then(function (data) {
+    //res.json(data)
     res.json({
       total: data.hits.total.value,
       results: data.hits.hits.map(hit => {
-        return hit//["_source"]
+        return hit["_source"]
       })
     })
   }, function (err) {
@@ -56,7 +57,8 @@ router.post('/', function (req, res, next) {
   }
 
   model.search('customer', {email: req.body.email}).then(function (user, err) {
-    if (user !== []) {
+    if (user.length) {
+      console.log("************user********", user)
       var uniqueUser = user[0]._source
       if (err) throw err;
       if (uniqueUser && user[0]._score >= 1) {
@@ -66,7 +68,7 @@ router.post('/', function (req, res, next) {
   });
 
   model.search('customer', {phone_number: req.body.phone_number}).then(function (user, err) {
-    if (user !== []) {
+    if (user.length) {
       var uniqueUser = user[0]._source
       if (err) throw err;
       if (uniqueUser && user[0]._score >= 1) {
@@ -79,7 +81,7 @@ router.post('/', function (req, res, next) {
     .then(function (data) {
       res.json(data._source)
     }, function (error) {
-      res.json({error: error.message});
+      res.json({error: error});
     });
 
 

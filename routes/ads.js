@@ -3,11 +3,15 @@ var model = require('../models/model.js');
 
 var router = express.Router();
 var type = 'ad'
-var index = 'sirinecorp';
 
 router.get('/', function (req, res, next) {
   model.getAllForType(type).then(function (data) {
-    res.json(data.hits.hits)
+    res.json({
+      total: data.hits.total.value,
+      results: data.hits.hits.map(hit => {
+        return hit["_source"]
+      })
+    })
   }, function (err) {
     res.json({error: err.message})
 
@@ -47,12 +51,13 @@ router.post('/', function (req, res, next) {
       date.setMonth(date.getMonth() + 1);
       req.body.expiration_date = date
     }
-
+console.log("here, all set")
     model.createResource(type, req.body)
       .then(function (data) {
         res.json(data._source)
       }, function (error) {
-        res.json({error: error.message});
+        console.log('errooooooooorrr', error)
+        res.json({error: error});
       });
   }).catch(function (err) {
     res.status(err.status).json({error: err});

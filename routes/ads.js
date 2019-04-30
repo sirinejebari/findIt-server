@@ -2,7 +2,7 @@ var express = require('express');
 var model = require('../models/model.js');
 
 var router = express.Router();
-var type = 'ad'
+var type = 'ads'
 
 router.get('/', function (req, res, next) {
   model.getAllForType(type).then(function (data) {

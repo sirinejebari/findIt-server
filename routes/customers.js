@@ -5,7 +5,7 @@ var express = require('express');
 var model = require('../models/model.js');
 
 var router = express.Router();
-var type = 'customer'
+var type = 'customers'
 
 
 router.get('/', function (req, res, next) {

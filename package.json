@@ -10,14 +10,14 @@
   "dependencies": {
     "@elastic/elasticsearch": "^7.0.0-rc.2",
     "bcrypt-nodejs": "0.0.3",
-    "body-parser": "^1.17.2",
+    "body-parser": "^1.19.0",
     "cookie-parser": "~1.4.3",
-    "debug": "~2.6.3",
+    "debug": "~4.1.1",
     "elasticsearch": "^15.4.1",
-    "express": "^4.15.3",
+    "express": "^4.16.4",
     "jade": "~1.11.0",
     "jsonwebtoken": "^8.5.1",
-    "morgan": "^1.8.1",
+    "morgan": "^1.9.1",
     "serve-favicon": "~2.4.2"
   }
 }

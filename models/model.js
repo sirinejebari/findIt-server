@@ -38,7 +38,7 @@ model.getAllForType = function (index) {
       }
     }).then(function (response) {
       if (response) {
-        resolve(response.body)
+        resolve(response.bod.hits.hits)
       }
     }, function (error) {
       reject(error)
@@ -163,7 +163,7 @@ model.search = function (index, fields) {
     }).then(function (data) {
 
       if (data) {
-        resolve(data.body)
+        resolve(data.body.hits.hits)
       }
     }, function (err) {
       reject(err)
@@ -189,7 +189,7 @@ model.searchExactly = function (index, fields) {
     }).then(function (data) {
 
       if (data) {
-        resolve(data.body)
+        resolve(data.body.hits.hits)
       }
     }, function (err) {
       reject(err)

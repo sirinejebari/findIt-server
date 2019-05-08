@@ -10,9 +10,8 @@ var app = require('../app');
 var bcrypt = require('bcrypt-nodejs');
 
 router.post('/', function(req, res) {
-
   // find the user
-  model.search('customers', req.body).then(function (user, err) {
+  model.search('customers', {'email': req.body.email} ).then(function (user, err) {
     var uniqueUser = user[0]._source
 
     if (err) throw err;
@@ -20,7 +19,6 @@ router.post('/', function(req, res) {
     if (!uniqueUser) {
       res.status(404).json({success: false, message: 'Authentication failed. User not found.'});
     } else if (uniqueUser) {
-console.log(uniqueUser)
       // check if password matches
       if (!bcrypt.compareSync(req.body.password, uniqueUser.password)) {
         res.status(401).json({success: false, message: 'Authentication failed. Wrong password.'});

@@ -53,7 +53,7 @@ router.post('/', function (req, res, next) {
     }
     model.createResource(type, req.body)
       .then(function (data) {
-        res.json(data._source)
+        res.json(data)
       }, function (error) {
         console.log('errooooooooorrr', error)
         res.json({error: error});

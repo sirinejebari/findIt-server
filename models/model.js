@@ -14,7 +14,10 @@ model.authorize = function (req, res, next) {
       jwt.verify(token, req.app.get('superSecret'), function (err, decoded) {
         if (err) reject({ success: false, message: 'Unauthorized', error: err, status: 401 });
 
-        else resolve(decoded);
+        else{
+          console.log('decoded _____________________________',decoded)
+          resolve(decoded);
+        } 
       });
     } else {
       reject({

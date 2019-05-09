@@ -19,6 +19,7 @@ router.post('/', function(req, res) {
       res.status(404).json({success: false, message: 'Authentication failed. User not found.'});
     } else {
       var uniqueUser = user[0]._source
+      userId = user[0]._id
 
       // check if password matches
       if (!bcrypt.compareSync(req.body.password, uniqueUser.password)) {
@@ -30,8 +31,8 @@ router.post('/', function(req, res) {
         var token = jwt.sign(uniqueUser,req.app.get('superSecret'), {
           expiresIn: 1440 // expires in 24 hours
         });
-        delete uniqueUser.password
-
+        delete uniqueUser.password;
+        uniqueUser.id = userId;
         // return the information including token as JSON
         res.json({
           success: true,

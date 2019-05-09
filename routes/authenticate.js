@@ -30,11 +30,13 @@ router.post('/', function(req, res) {
         var token = jwt.sign(uniqueUser,req.app.get('superSecret'), {
           expiresIn: 1440 // expires in 24 hours
         });
+        delete uniqueUser.password
 
         // return the information including token as JSON
         res.json({
           success: true,
-          token: token
+          token: token,
+          user: uniqueUser
         });
       }
     }

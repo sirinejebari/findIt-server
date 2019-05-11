@@ -14,10 +14,9 @@ model.authorize = function (req, res, next) {
       jwt.verify(token, req.app.get('superSecret'), function (err, decoded) {
         if (err) reject({ success: false, message: 'Unauthorized', error: err, status: 401 });
 
-        else{
-          console.log('decoded _____________________________',decoded)
+        else {
           resolve(decoded);
-        } 
+        }
       });
     } else {
       reject({
@@ -75,31 +74,37 @@ model.createResource = function (index, body) {
   }
   var lastId;
   return new Promise(function (resolve, reject) {
-    ElasticClient.count({
-      index: index
+    ElasticClient.search({
+      index: index,
+      body: {
+        "aggs" : {
+          "max_id" : { "max" : { "field" : "elementId" } }
+      }
+    }
     }).then(function (data) {
 
-      lastId = data.body.count + 1
+      lastId = data.body.aggregations.max_id.value + 1
+      body.elementId = lastId;
 
-      ElasticClient.create({
-        index: index,
-        type: index,
-        id: lastId,
-        body: body
-      }, function (error, response) {
-        if (error) {
-          reject(error)
-        }
-        if (response) {
-          model.getResource(lastId, index).then(function (data) {
-            resolve(data)
-          }).catch(function (err) {
-            reject(err)
-          })
-        }
-      })
-    }).catch(() => {
-      console.log('error when counting')
+        ElasticClient.create({
+          index: index,
+          type: index,
+          id: lastId,
+          body: body
+        }, function (error, response) {
+          if (error) {
+            reject(error)
+          }
+          if (response) {
+            model.getResource(lastId, index).then(function (data) {
+              resolve(data)
+            }).catch(function (err) {
+              reject(err)
+            })
+          }
+        })
+    }, (err) => {
+      console.log('error when counting', err)
     })
   })
 

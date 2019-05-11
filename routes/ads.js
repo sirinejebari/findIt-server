@@ -17,12 +17,15 @@ router.get('/find-in-bounds/', function (req, res, next) {
         maxLat: maxLat,
         minLong: minLong,
         maxLong: maxLong
-      }).then((data)=> {
-        console.log(data)
-        res.json({data: data})
-      }, (error)=>{
+      }).then((data) => {
+        console.log(data.hits.total)
+        res.json({
+          data: data.hits.hits,
+          total: data.hits.total
+        })
+      }, (error) => {
         console.log(error);
-        res.status(500).json({erreur: error})
+        res.status(500).json({ erreur: error })
       })
     } else {
       res.status(400).json({ error: 'incomplete bounds' })

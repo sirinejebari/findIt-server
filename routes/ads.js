@@ -5,7 +5,6 @@ var router = express.Router();
 var type = 'ads'
 
 router.get('/find-in-bounds/', function (req, res, next) {
-  console.log(req.query)
   if (Object.keys(req.query).length) {
     let minLat = req.query.minLat
     let maxLat = req.query.maxLat
@@ -18,7 +17,6 @@ router.get('/find-in-bounds/', function (req, res, next) {
         minLong: minLong,
         maxLong: maxLong
       }).then((data) => {
-        console.log(data.hits.total)
         res.json({
           data: data.hits.hits,
           total: data.hits.total
@@ -103,7 +101,6 @@ router.post('/', function (req, res, next) {
       .then(function (data) {
         res.json(data)
       }, function (error) {
-        console.log('errooooooooorrr', error.body)
         res.json({ error: error });
       });
   }).catch(function (err) {
@@ -120,10 +117,12 @@ router.post('/apt-hunt', (req, res) => {
     if (!req.body.link || req.body.link === '') {
       return res.status(400).json({ error: "Link is missing" });
     }
-    model.createResource('apt-hunt-ad', req.body)
+    model.createResource('apt-hunt-ad', {...req.body,
+    user: JSON.stringify(req.body)})
     .then(function (data) {
-      console.log('data',data)
-      res.json(data)
+      let result = {...data,
+      user: JSON.parse(data.user)}
+      res.json(result)
     }, function (error) {
       res.json({ error: error });
     });

@@ -105,6 +105,7 @@ model.createResource = function (index, body) {
         })
     }, (err) => {
       console.log('error when counting', err)
+      reject(err)
     })
   })
 

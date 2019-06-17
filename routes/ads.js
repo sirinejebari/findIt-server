@@ -122,6 +122,7 @@ router.post('/apt-hunt', (req, res) => {
     }
     model.createResource('apt-hunt-ad', req.body)
     .then(function (data) {
+      console.log('#########',data)
       res.json(data)
     }, function (error) {
       res.json({ error: error });
@@ -133,12 +134,6 @@ router.post('/apt-hunt', (req, res) => {
 //TODO doesnt work, to figure out later
 router.put('/:id', function (req, res, next) {
   model.authorize(req).then(function (data) {
-
-    model.editResource(type, req.params.id, req.body)
-      .then(function (data) {
-        res.json(data._source)
-      }, function (error) {
-        res.json({ error: error.message });
       });
   }).catch(function (err) {
     res.status(err.status).json({ error: err });

@@ -49,6 +49,19 @@ router.get('/', function (req, res, next) {
 
   })
 });
+router.get('/apt-hunt', function (req, res, next) {
+  model.getAllForType('apt-hunt-ad').then(function (data) {
+    res.json({
+      total: data.hits.total.value,
+      results: data.hits.hits.map(hit => {
+        return hit["_source"]
+      })
+    })
+  }, function (err) {
+    res.json({ error: err.message })
+
+  })
+});
 
 router.get('/:id', function (req, res, next) {
   model.getResource(req.params.id, type).then(function (data) {
@@ -78,7 +91,10 @@ router.post('/', function (req, res, next) {
     if (!req.body.description || req.body.description === '') {
       return res.status(400).json({ error: "missing field : price" });
     }
-    if (!req.body.expiration_date || req.body.price === '') {
+    if (!req.body.type || req.body.type === '') {
+      return res.status(400).json({ error: "missing field : type" });
+    }
+    if (!req.body.expiration_date || req.body.expiration_date === '') {
       var date = new Date()
       date.setMonth(date.getMonth() + 1);
       req.body.expiration_date = date
@@ -94,6 +110,25 @@ router.post('/', function (req, res, next) {
     res.status(err.status).json({ error: err });
   });
 
+})
+
+router.post('/apt-hunt', (req, res) => {
+  model.authorize(req).then((data) => {
+    if (!req.body.user || req.body.user === '') {
+      return res.status(400).json({ error: "User is missing" });
+    }
+    if (!req.body.link || req.body.link === '') {
+      return res.status(400).json({ error: "Link is missing" });
+    }
+    model.createResource('apt-hunt-ad', req.body)
+    .then(function (data) {
+      res.json(data)
+    }, function (error) {
+      res.json({ error: error });
+    });
+  }).catch(function (err) {
+    res.status(err.status).json({ error: err });
+  });
 })
 //TODO doesnt work, to figure out later
 router.put('/:id', function (req, res, next) {

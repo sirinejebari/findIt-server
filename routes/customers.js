@@ -83,7 +83,7 @@ router.post('/', function (req, res, next) {
             .then(function (data) {
               return res.json(data)
             }, function (error) {
-              return res.json({ error: error });
+              return res.json({ error: error.body.error });
             });
         }
       }).catch(() => {

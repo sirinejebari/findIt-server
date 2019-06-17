@@ -118,7 +118,7 @@ router.post('/apt-hunt', (req, res) => {
       return res.status(400).json({ error: "Link is missing" });
     }
     model.createResource('apt-hunt-ad', {...req.body,
-    user: JSON.stringify(req.body)})
+    user: JSON.stringify(req.body.user)})
     .then(function (data) {
       let result = {...data,
       user: JSON.parse(data.user)}

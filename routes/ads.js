@@ -48,20 +48,27 @@ router.get('/', function (req, res, next) {
   })
 });
 router.get('/apt-hunt', function (req, res, next) {
-  model.getAllForType('apt-hunt-ad').then(function (data) {
-    res.json({
-      total: data.hits.total.value,
-      results: data.hits.hits.map(hit => {
-        let item = hit["_source"];
-        item = {...item,
-        user: JSON.parse(item.user)}
-        return item
+  model.authorize(req).then(function (data) {
+    model.getAllForType('apt-hunt-ad').then(function (data) {
+      res.json({
+        total: data.hits.total.value,
+        results: data.hits.hits.map(hit => {
+          let item = hit["_source"];
+          item = {
+            ...item,
+            user: JSON.parse(item.user)
+          }
+          return item
+        })
       })
-    })
-  }, function (err) {
-    res.json({ error: err.message })
+    }, function (err) {
+      res.json({ error: err.message })
 
-  })
+    })
+  }).catch(function (err) {
+    res.status(err.status).json({ error: err });
+  });
+  //
 });
 
 router.get('/:id', function (req, res, next) {
@@ -70,6 +77,7 @@ router.get('/:id', function (req, res, next) {
   }, function (err) {
     res.json({ error: err })
   })
+
 });
 
 router.get('/apt-hunt/:id', function (req, res, next) {
@@ -128,16 +136,20 @@ router.post('/apt-hunt', (req, res) => {
     if (!req.body.link || req.body.link === '') {
       return res.status(400).json({ error: "Link is missing" });
     }
-    model.createResource('apt-hunt-ad', {...req.body,
-    user: JSON.stringify(req.body.user),
-    status: 'PENDING'})
-    .then(function (data) {
-      let result = {...data,
-      user: JSON.parse(data.user)}
-      res.json(result)
-    }, function (error) {
-      res.json({ error: error });
-    });
+    model.createResource('apt-hunt-ad', {
+      ...req.body,
+      user: JSON.stringify(req.body.user),
+      status: 'PENDING'
+    })
+      .then(function (data) {
+        let result = {
+          ...data,
+          user: JSON.parse(data.user)
+        }
+        res.json(result)
+      }, function (error) {
+        res.json({ error: error });
+      });
   }).catch(function (err) {
     res.status(err.status).json({ error: err });
   });

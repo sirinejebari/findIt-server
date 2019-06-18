@@ -176,7 +176,7 @@ model.search = function (index, fields) {
     }).then(function (data) {
 
       if (data) {
-        resolve(data.body.hits.hits)
+        resolve(data.body)
       }
     }, function (err) {
       reject(err)

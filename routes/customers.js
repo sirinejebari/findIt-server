@@ -56,6 +56,7 @@ router.post('/', function (req, res, next) {
     return res.status(400).json({ error: "missing field : phone_number" });
   }
   model.searchExactly('customers',  "email", req.body.email ).then((user, err) => {
+
     if (err){
       (err) => {
         return res.status(400).json({ error: 'an error has occurred 1', message: err });
@@ -64,21 +65,17 @@ router.post('/', function (req, res, next) {
     if (user.length) {
       proceed = false;
       var uniqueUser = user[0]._source
-      if (uniqueUser && user[0]._score >= 1) {
         return res.status(400).json({ error: "email address already used" });
-      }
+      
     } 
     else {
       model.searchExactly('customers',  "phone_number", req.body.phone_number ).then((user) => {
-        proceed = false;
+        if (err) throw err;
         if (user.length) {
-          var uniqueUser = user[0]._source
-          if (err) throw err;
-          if (uniqueUser && user[0]._score >= 1) {
+          proceed = false;         
+          
             return res.status(400).json({ error: "phone_number already used" });
-          }
         } else {
-
           model.createResource(type, req.body)
             .then(function (data) {
               return res.json(data)

@@ -49,22 +49,23 @@ router.get('/', function (req, res, next) {
 });
 router.get('/apt-hunt', function (req, res, next) {
   model.authorize(req).then(function (data) {
-    model.getAllForType('apt-hunt-ad').then(function (data) {
-      res.json({
-        total: data.hits.total.value,
-        results: data.hits.hits.map(hit => {
-          let item = hit["_source"];
-          item = {
-            ...item,
-            user: JSON.parse(item.user)
-          }
-          return item
+    let userId = data.elementId
+    model.search('apt-hunt-ad', {userId: userId})
+      .then(function (data) {
+        res.json({
+          total: data.hits.total,
+          results: data.hits.hits.map(hit => {
+            let item = hit["_source"];
+            item = {
+              ...item,
+              user: JSON.parse(item.user)
+            }
+            return item
+          })
         })
-      })
-    }, function (err) {
-      res.json({ error: err.message })
-
-    })
+      }, function (error) {
+        res.json({ error: error.message });
+      });
   }).catch(function (err) {
     res.status(err.status).json({ error: err });
   });
@@ -139,6 +140,7 @@ router.post('/apt-hunt', (req, res) => {
     model.createResource('apt-hunt-ad', {
       ...req.body,
       user: JSON.stringify(req.body.user),
+      userId: req.body.user.id,
       status: 'PENDING'
     })
       .then(function (data) {
@@ -200,7 +202,7 @@ router.post('/search', function (req, res, next) {
   model.authorize(req).then(function (data) {
     model.search(type, req.body)
       .then(function (data) {
-        res.json(data)
+        res.json(data.hits.hits)
       }, function (error) {
         res.json({ error: error.message });
       });

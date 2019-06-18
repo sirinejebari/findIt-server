@@ -52,7 +52,10 @@ router.get('/apt-hunt', function (req, res, next) {
     res.json({
       total: data.hits.total.value,
       results: data.hits.hits.map(hit => {
-        return hit["_source"]
+        let item = hit["_source"];
+        item = {...item,
+        user: JSON.parse(item.user)}
+        return item
       })
     })
   }, function (err) {
@@ -63,6 +66,14 @@ router.get('/apt-hunt', function (req, res, next) {
 
 router.get('/:id', function (req, res, next) {
   model.getResource(req.params.id, type).then(function (data) {
+    res.json(data)
+  }, function (err) {
+    res.json({ error: err })
+  })
+});
+
+router.get('/apt-hunt/:id', function (req, res, next) {
+  model.getResource(req.params.id, 'apt-hunt-ad').then(function (data) {
     res.json(data)
   }, function (err) {
     res.json({ error: err })
@@ -149,6 +160,19 @@ router.delete('/:id', function (req, res, next) {
   model.authorize(req).then(function (data) {
 
     model.deleteResource(type, req.params.id)
+      .then(function (data) {
+        res.json(data._source)
+      }, function (error) {
+        res.json({ error: error.message });
+      });
+  }).catch(function (err) {
+    res.status(err.status).json({ error: err });
+  });
+})
+router.delete('/apt-hunt/:id', function (req, res, next) {
+  model.authorize(req).then(function (data) {
+
+    model.deleteResource('apt-hunt-ad', req.params.id)
       .then(function (data) {
         res.json(data._source)
       }, function (error) {

@@ -142,9 +142,16 @@ model.editResource = function (index, id, data) {
 model.deleteResource = function (index, id) {
   return new Promise(function (resolve, reject) {
 
-    ElasticClient.delete({
+    ElasticClient.deleteByQuery({
       index: index,
-      id: id
+      type: index,
+      body: {
+        "query": { 
+          "match": {
+            "elementId": id
+          }
+        }
+      }
     }, function (response, error) {
       if (error) {
         reject(error)

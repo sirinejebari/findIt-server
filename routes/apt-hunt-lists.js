@@ -106,7 +106,7 @@ router.get('/apt-hunt-list-by-user', (req, res) => {
 
 router.get('/ads-in-list/:id', (req, res) => {
     model.authorize(req).then(function (data) {
-        model.search(type, { 'listId': req.params.id }).then(data => {
+        model.search(type, { 'listId': req.params.id}).then(data => {
             let results = data.hits.hits.map(rslt => rslt['_source'])
             res.json({
                 total: data.hits.total,

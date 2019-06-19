@@ -66,11 +66,10 @@ router.post('/apt-hunt', (req, res) => {
 
 router.post('/apt-hunt-list', (req, res) => {
     model.authorize(req).then(data => {
-        if (!req.body.ownerId || req.body.ownerId === '') {
-            return res.status(400).json({ error: "ownerId is missing" });
-        }
+        console.log(data)
+        
         model.createResource(listType, {
-            ownerId: req.body.ownerId,
+            ownerId: data.elementId,
             name: req.body.name ? req.body.name : 'Unnamed list'
         }).then(data => {
             res.status(200).json(data)

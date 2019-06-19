@@ -44,6 +44,9 @@ router.post('/apt-hunt', (req, res) => {
         if (!req.body.link || req.body.link === '') {
             return res.status(400).json({ error: "Link is missing" });
         }
+        if (!req.body.listId || req.body.listId === '') {
+            return res.status(400).json({ error: "listId is missing" });
+        }
         model.createResource(type, {
             ...req.body,
             user: JSON.stringify(req.body.user),
@@ -92,6 +95,23 @@ router.put('/add-contributer/:id', (req, res) => {
 router.get('/apt-hunt-list-by-user', (req, res) => {
     model.authorize(req).then(function (data) {
         model.search(listType, { 'ownerId': data.elementId }).then(data => {
+            let results = data.hits.hits.map(rslt =>  rslt['_source'])
+            res.json({
+                total: data.hits.total,
+                results: results
+            })
+        }).catch(err => {
+            res.status(err.status).json({ error: err });
+        })
+    }).catch(function (err) {
+        res.status(err.status).json({ error: err });
+    });
+})
+
+router.get('/ads-in-list/:id', (req, res) => {
+    console.log(req.params)
+    model.authorize(req).then(function (data) {
+        model.search(type, { 'listId': req.params.id }).then(data => {
             res.json({
                 total: data.hits.total,
                 results: data.hits.hits

@@ -36,7 +36,7 @@ router.get('/apt-hunt/:id', function (req, res, next) {
     })
 });
 
-router.post('/apt-hunt', (req, res) => {
+router.post('/add-to-list/:id', (req, res) => {
     model.authorize(req).then((data) => {
         if (!req.body.user || req.body.user === '') {
             return res.status(400).json({ error: "User is missing" });
@@ -44,11 +44,9 @@ router.post('/apt-hunt', (req, res) => {
         if (!req.body.link || req.body.link === '') {
             return res.status(400).json({ error: "Link is missing" });
         }
-        if (!req.body.listId || req.body.listId === '') {
-            return res.status(400).json({ error: "listId is missing" });
-        }
         model.createResource(type, {
             ...req.body,
+            listId: req.params.id,
             user: JSON.stringify(req.body.user),
             userId: req.body.user.id,
             status: 'PENDING'
@@ -68,9 +66,7 @@ router.post('/apt-hunt', (req, res) => {
 })
 
 router.post('/apt-hunt-list', (req, res) => {
-    model.authorize(req).then(data => {
-        console.log(data)
-        
+    model.authorize(req).then(data => {        
         model.createResource(listType, {
             ownerId: data.elementId,
             name: req.body.name ? req.body.name : 'Unnamed list'
@@ -109,12 +105,12 @@ router.get('/apt-hunt-list-by-user', (req, res) => {
 })
 
 router.get('/ads-in-list/:id', (req, res) => {
-    console.log(req.params)
     model.authorize(req).then(function (data) {
         model.search(type, { 'listId': req.params.id }).then(data => {
+            let results = data.hits.hits.map(rslt => rslt['_source'])
             res.json({
                 total: data.hits.total,
-                results: data.hits.hits
+                results: results
             })
         }).catch(err => {
             res.status(err.status).json({ error: err });

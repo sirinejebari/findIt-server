@@ -110,7 +110,13 @@ router.get('/ads-in-list/:id', (req, res) => {
             let results = data.hits.hits.map(rslt => rslt['_source'])
             res.json({
                 total: data.hits.total,
-                results: results
+                results: results.map(hit => {
+                    
+                    return {
+                        ...hit,
+                        user: JSON.parse(hit.user)
+                    }
+                })
             })
         }).catch(err => {
             res.status(err.status).json({ error: err });

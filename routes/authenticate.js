@@ -6,13 +6,11 @@ var express = require('express');
 var router = express.Router();
 var model = require('../models/model.js');
 var jwt    = require('jsonwebtoken'); // used to create, sign, and verify tokens
-var app = require('../app');
 var bcrypt = require('bcrypt-nodejs');
 
 router.post('/', function(req, res) {
   // find the user
   model.search('customers', {'email': req.body.email} ).then(function (response, err) {
-    console.log('___________', response.hits.hits)
 
     let user = response.hits.hits
     if (err) throw err;

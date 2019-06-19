@@ -7,6 +7,7 @@ var bodyParser = require('body-parser');
 var config = require('./config');
 var index = require('./routes/index');
 var ads = require('./routes/ads');
+var aptHunt = require('./routes/apt-hunt-lists');
 var customers = require('./routes/customers')
 var authenticationRoute = require('./routes/authenticate')
 var app = express();
@@ -29,6 +30,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', index);
 app.use('/ads', ads);
+app.use('/apt-hunt', aptHunt);
 app.use('/customers', customers);
 app.use('/authenticate', authenticationRoute);
 

@@ -1,6 +1,4 @@
 var ElasticClient = require('../models/elasticClient.js');
-var bcrypt = require('bcrypt-nodejs');
-var jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
 var model = {};
 index= 'ads';
 

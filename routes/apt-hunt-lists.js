@@ -3,7 +3,7 @@ var model = require('../models/model.js');
 var router = express.Router();
 var type = 'apt-hunt-ad'
 var listType = 'apt-hunt-list'
-
+var aptListModel = require('../models/apHuntListModal')
 router.get('/apt-hunt', function (req, res, next) {
     model.authorize(req).then(function (data) {
         let userId = data.elementId
@@ -132,6 +132,21 @@ router.get('/apt-hunt-list-by-user', (req, res) => {
     });
 })
 
+router.get('/shared-apt-hunt-list/:id', (req, res) => {
+    model.authorize(req).then(function () {
+        aptListModel.getListsByContributerId(req.params.id).then(data => {
+            res.json({
+                total: data.hits.total,
+                results: data.hits.hits.map(elm => {
+                    delete elm['_source']['ctx']
+                    return elm['_source']
+                })
+            })
+        })
+    }).catch(function (err) {
+        res.status(401).json({ error: err });
+    });
+})
 router.get('/ads-in-list/:id', (req, res) => {
     model.authorize(req).then(function (data) {
         model.search(type, { 'listId': req.params.id }).then(data => {

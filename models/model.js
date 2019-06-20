@@ -168,7 +168,6 @@ model.deleteResource = function (index, id) {
 model.search = function (index, fields) {
   fields.state = 'valid';
   //TODO handle expiry_date
-  //TODO within x km from lat long
   return new Promise(function (resolve, reject) {
 
     ElasticClient.search({

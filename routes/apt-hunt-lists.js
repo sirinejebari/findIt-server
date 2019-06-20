@@ -94,7 +94,6 @@ router.put('/add-contributer/:id', (req, res) => {
             }
             else {
                 let foundUser = user[0]["_source"]
-                let payload = req.body.list;
                 delete payload.contributors;
                 let newContributorsList = new Array(1).fill(foundUser.elementId)
                payload.contributors =  payload.contributors ?  payload.contributors.push(foundUser.elementId): newContributorsList

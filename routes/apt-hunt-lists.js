@@ -81,7 +81,6 @@ router.post('/apt-hunt-list', (req, res) => {
 })
 router.put('/add-contributer/:id', (req, res) => {
     model.authorize(req).then(function (data) {
-        console.log(req.params, req.body)
         model.searchExactly('customers', "email", req.body.email).then((user, err) => {
 
             if (err) {
@@ -96,6 +95,7 @@ router.put('/add-contributer/:id', (req, res) => {
             else {
                 let foundUser = user[0]["_source"]
                 let payload = req.body.list;
+                delete payload.contributors;
                 let newContributorsList = new Array(1).fill(foundUser.elementId)
                payload.contributors =  payload.contributors ?  payload.contributors.push(foundUser.elementId): newContributorsList
                 model.editResource(listType, req.params.id,req.body.list).then((data, err)=> {

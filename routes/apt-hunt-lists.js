@@ -95,7 +95,7 @@ router.put('/add-contributer/:id', (req, res) => {
             else {
                 let foundUser = user[0]["_source"]
                 let payload = req.body.list;
-                if(payload.contributors && payload.contributors.includes(foundUser.elementId)){
+                if(payload.contributors && payload.contributors.indexOf(foundUser.elementId) >= 0){
                     return res.status(400).json({error: 'list already shared with this user'})
                 } else {
                     let newContributorsList = new Array(1).fill(foundUser.elementId)

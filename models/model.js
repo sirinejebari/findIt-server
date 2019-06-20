@@ -76,33 +76,34 @@ model.createResource = function (index, body) {
   return new Promise(function (resolve, reject) {
     ElasticClient.search({
       index: index,
+      type: 'apt-hunt-list',
       body: {
-        "aggs" : {
-          "max_id" : { "max" : { "field" : "elementId" } }
+        "aggs": {
+          "max_id": { "max": { "field": "elementId" } }
+        }
       }
-    }
     }).then(function (data) {
 
       lastId = data.body.aggregations.max_id.value + 1
       body.elementId = lastId;
 
-        ElasticClient.create({
-          index: index,
-          type: index,
-          id: lastId,
-          body: body
-        }, function (error, response) {
-          if (error) {
-            reject(error)
-          }
-          if (response) {
-            model.getResource(lastId, index).then(function (data) {
-              resolve(data)
-            }).catch(function (err) {
-              reject(err)
-            })
-          }
-        })
+      ElasticClient.create({
+        index: index,
+        type: index,
+        id: lastId,
+        body: body
+      }, function (error, response) {
+        if (error) {
+          reject(error)
+        }
+        if (response) {
+          model.getResource(lastId, index).then(function (data) {
+            resolve(data)
+          }).catch(function (err) {
+            reject(err)
+          })
+        }
+      })
     }, (err) => {
       console.log('error when counting', err)
       reject(err)
@@ -113,23 +114,22 @@ model.createResource = function (index, body) {
 
 model.editResource = function (index, id, data) {
   return new Promise(function (resolve, reject) {
-
-    ElasticClient.update({
+    ElasticClient.updateByQuery({
       index: index,
-      id: id,
+      type: index,
       body: {
-        script: {
-          "inline": "ctx._source= params",
-          "lang": "painless",
+        "query": { "match": { "elementId": data.elementId } },
+        "script": {
+          "inline": "ctx._source = params",
           "params": data
         }
       }
     }, function (error, response) {
       if (error) {
-        reject(error)
+        return reject(error)
       }
       if (response) {
-        model.getResource(id, type).then(function (data) {
+        model.getResource(id, index).then(function (data) {
           resolve(data)
         }).catch(function (err) {
           reject(error)
@@ -146,7 +146,7 @@ model.deleteResource = function (index, id) {
       index: index,
       type: index,
       body: {
-        "query": { 
+        "query": {
           "match": {
             "elementId": id
           }

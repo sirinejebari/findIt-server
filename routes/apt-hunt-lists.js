@@ -66,7 +66,7 @@ router.post('/add-to-list/:id', (req, res) => {
 })
 
 router.post('/apt-hunt-list', (req, res) => {
-    model.authorize(req).then(data => {        
+    model.authorize(req).then(data => {
         model.createResource(listType, {
             ownerId: data.elementId,
             name: req.body.name ? req.body.name : 'Unnamed list'
@@ -82,7 +82,32 @@ router.post('/apt-hunt-list', (req, res) => {
 router.put('/add-contributer/:id', (req, res) => {
     model.authorize(req).then(function (data) {
         console.log(req.params, req.body)
-       // model.editResource(listType, req.params.id, req.body)
+        model.searchExactly('customers', "email", req.body.email).then((user, err) => {
+
+            if (err) {
+                (err) => {
+                    return res.status(400).json({ error: 'an error has occurred', message: err });
+                }
+            }
+            if (!user.length) {
+                return res.status(404).json({ error: `cant find user with email ${req.body.email}. Please make sure this person has an account.` });
+
+            }
+            else {
+                let foundUser = user[0]["_source"]
+                let payload = req.body.list;
+                payload.contributors =  payload.contributors ?  payload.contributors.push(foundUser.elementId): [foundUser.elementId]
+                model.editResource(listType, req.params.id,req.body.list).then((data, err)=> {
+                    if(err) {
+                        res.status(err.status).json({error: err})
+                    }
+                    delete data.ctx;
+                    res.json(data)
+                 })
+                
+            }
+        })
+        
     }).catch(function (err) {
         res.status(err.status).json({ error: err });
     });
@@ -91,7 +116,7 @@ router.put('/add-contributer/:id', (req, res) => {
 router.get('/apt-hunt-list-by-user', (req, res) => {
     model.authorize(req).then(function (data) {
         model.search(listType, { 'ownerId': data.elementId }).then(data => {
-            let results = data.hits.hits.map(rslt =>  rslt['_source'])
+            let results = data.hits.hits.map(rslt => rslt['_source'])
             res.json({
                 total: data.hits.total,
                 results: results
@@ -106,12 +131,12 @@ router.get('/apt-hunt-list-by-user', (req, res) => {
 
 router.get('/ads-in-list/:id', (req, res) => {
     model.authorize(req).then(function (data) {
-        model.search(type, { 'listId': req.params.id}).then(data => {
+        model.search(type, { 'listId': req.params.id }).then(data => {
             let results = data.hits.hits.map(rslt => rslt['_source'])
             res.json({
                 total: data.hits.total,
                 results: results.map(hit => {
-                    
+
                     return {
                         ...hit,
                         user: JSON.parse(hit.user)

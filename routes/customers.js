@@ -59,7 +59,7 @@ router.post('/', function (req, res, next) {
 
     if (err){
       (err) => {
-        return res.status(400).json({ error: 'an error has occurred 1', message: err });
+        return res.status(400).json({ error: 'an error has occurred', message: err });
       }
     }
     if (user.length) {

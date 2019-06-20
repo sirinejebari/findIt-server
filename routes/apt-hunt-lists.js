@@ -98,8 +98,7 @@ router.put('/add-contributer/:id', (req, res) => {
                 let payload = req.body.list;
                 let newContributorsList = []
                 newContributorsList.push(foundUser.elementId)
-                payload.contributors = []
-               //payload.contributors =  payload.contributors ?  payload.contributors.push(foundUser.elementId): newContributorsList
+               payload.contributors =  payload.contributors ?  payload.contributors.push(foundUser.elementId): newContributorsList
                 model.editResource(listType, req.params.id,req.body.list).then((data, err)=> {
                     if(err) {
                         res.status(err.status).json({error: err})

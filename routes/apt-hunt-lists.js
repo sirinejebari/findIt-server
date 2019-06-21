@@ -116,6 +116,24 @@ router.put('/add-contributer/:id', (req, res) => {
     });
 })
 
+router.put('/:id', (req, res) => {
+    model.authorize(req).then(function(data, err) {
+        payload = {...req.body,
+        user : JSON.stringify(req.body.user)}
+        
+        model.editResource(type, req.params.id,payload ).then((data, err)=> {
+            if(err) {
+                res.status(err.status).json({error: err})
+            }
+            delete data.ctx;
+            data = {...data, user: JSON.parse(data.user)}
+            res.json(data)
+         }).catch(error => {console.log(error.meta.body.failures[0])})
+    },function (err) {
+        res.status(err.status).json({ error: err });
+    })
+})
+
 router.get('/apt-hunt-list-by-user', (req, res) => {
     model.authorize(req).then(function (data) {
         model.search(listType, { 'ownerId': data.elementId }).then(data => {

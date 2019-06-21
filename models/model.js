@@ -76,7 +76,7 @@ model.createResource = function (index, body) {
   return new Promise(function (resolve, reject) {
     ElasticClient.search({
       index: index,
-      type: 'apt-hunt-list',
+      type: index,
       body: {
         "aggs": {
           "max_id": { "max": { "field": "elementId" } }

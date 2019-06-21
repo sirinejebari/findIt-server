@@ -51,14 +51,15 @@ router.post('/add-to-list/:id', (req, res) => {
             userId: req.body.user.id,
             status: 'PENDING'
         })
-            .then(function (data) {
+            .then(function (data, err) {
+                if (err) {
+                    res.json({ error: error });
+                }
                 let result = {
                     ...data,
                     user: JSON.parse(data.user)
                 }
-                res.json(result)
-            }, function (error) {
-                res.json({ error: error });
+               res.json(result)
             });
     }).catch(function (err) {
         res.status(err.status).json({ error: err });

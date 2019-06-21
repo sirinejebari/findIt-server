@@ -129,7 +129,7 @@ router.put('/:id', (req, res) => {
             delete data.ctx;
             data = {...data, user: JSON.parse(data.user)}
             res.json(data)
-         }).catch(error => {console.log(error.meta.body.failures[0])})
+         }).catch(error => { res.status(500).json({ error: error });})
     },function (err) {
         res.status(err.status).json({ error: err });
     })
@@ -168,17 +168,17 @@ router.get('/shared-apt-hunt-list/:id', (req, res) => {
 })
 router.get('/ads-in-list/:id', (req, res) => {
     model.authorize(req).then(function (data) {
-        model.search(type, { 'listId': req.params.id }).then(data => {
-            let results = data.hits.hits.map(rslt => rslt['_source'])
+        model.search(type, { 'listId': req.params.id }, {'status': 'DECLINED'}).then(data => {
+            let results = data.hits.hits.map(rslt => {
+                let rs = rslt['_source']
+                return {
+                    ...rs,
+                    user: JSON.parse(rs.user)
+                }
+            })
             res.json({
                 total: data.hits.total,
-                results: results.map(hit => {
-
-                    return {
-                        ...hit,
-                        user: JSON.parse(hit.user)
-                    }
-                })
+                results: results
             })
         }).catch(err => {
             res.status(err.status).json({ error: err });

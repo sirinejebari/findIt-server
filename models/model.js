@@ -165,18 +165,24 @@ model.deleteResource = function (index, id) {
 
 }
 
-model.search = function (index, fields) {
-  fields.state = 'valid';
+model.search = function (index, fields, fieldsMustNot) {
+  //fields.state = 'valid';
   //TODO handle expiry_date
   return new Promise(function (resolve, reject) {
 
+    let boolBody = {};
+    if (fields) {
+      boolBody.should = buildMatchQueryFields(fields)
+    }
+
+    if (fieldsMustNot) {
+      boolBody.must_not = buildMatchQueryFields(fieldsMustNot)
+    }
     ElasticClient.search({
       index: index,
       body: {
         "query": {
-          "bool": {
-            "should": buildMatchQueryFields(fields)
-          }
+          "bool": boolBody
         }
       }
     }).then(function (data) {
